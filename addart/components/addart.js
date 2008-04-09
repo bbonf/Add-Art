@@ -132,7 +132,7 @@ const component = {
     
     
     var request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-	.createInstance(Components.interfaces.nsIJSXMLHttpRequest);
+	.createInstance(Components.interfaces.nsIXMLHttpRequest);
     request.open("GET", "http://add-art.org/extension/server.rdf");
     
     request.onload = function(ev) {
