@@ -129,6 +129,17 @@ const component = {
                     .createInstance(Components.interfaces.nsIXMLHttpRequest);
     req.open("GET", "chrome://addart/content/scripts.xml", false);
     req.send(false);
+    
+    
+    var request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+	.createInstance(Components.interfaces.nsIJSXMLHttpRequest);
+    request.open("GET", "http://add-art.org/extension/server.rdf");
+    
+    request.onload = function(ev) {
+      window.dump(ev.target.responseText)
+			}
+    request.send(null);
+    request = null;
 
     var converter = Components.classes["@mozilla.org/intl/texttosuburi;1"]
                               .getService(Components.interfaces.nsITextToSubURI);
