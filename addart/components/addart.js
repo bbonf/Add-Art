@@ -85,7 +85,7 @@ const factory = {
 
     throw Components.results.NS_ERROR_NO_INTERFACE;
   }
-}
+};
 
 /*
  * Addart component
@@ -130,17 +130,60 @@ const component = {
     req.open("GET", "chrome://addart/content/scripts.xml", false);
     req.send(false);
     
-    
+    // test fetching server.rdf
     var request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-	.createInstance(Components.interfaces.nsIXMLHttpRequest);
+                  .createInstance(Components.interfaces.nsIXMLHttpRequest);
     request.open("GET", "http://add-art.org/extension/server.rdf");
     
     request.onload = function(ev) {
-      window.dump(ev.target.responseText)
-			}
+      window.dump(ev.target.responseText);
+		};
     request.send(null);
     request = null;
+    
+    // another test
+    // try{
+    //   alert(getContents("chrome://browser/content/browser.css"));
+    //   alert(getContents("http://add-art.org/extension/server.rdf"));
+    // } catch(e){ alert(e) }
+    
 
+    // TODO is it a new show?! download some shit
+    // ref: http://developer.mozilla.org/en/docs/Code_snippets:File_I/O#Creating_a_file_object_.28.22opening.22_files.29
+    if(true) {
+
+      // TODO download new show data; should be diff file from above to save bytes
+      
+      // TODO parse said XML
+      // -> http://developer.mozilla.org/en/docs/Parsing_and_serializing_XML
+
+      // create a folder for this show's images      
+      var file = Components.classes["@mozilla.org/file/directory_service;1"]
+                           .getService(Components.interfaces.nsIProperties)
+                           .get("addart", Components.interfaces.nsIFile);
+      file.append("DIR");
+      if( !file.exists() || !file.isDirectory() ) {   // if it doesn't exist, create
+         file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0777);
+      }
+    
+      // TODO fetch & store files from XML in the new folder
+    
+      // iterate over folder's contents for shits and giggles REMOVEME
+      var entries = file.directoryEntries;
+      var array = [];
+      while(entries.hasMoreElements())
+      {
+        var entry = entries.getNext();
+        entry.QueryInterface(Components.interfaces.nsIFile);
+        array.push(entry);
+      }
+    }
+    
+    // TODO instantiate the artbanners array from the XML
+    
+    // done with all that remote nonsense
+
+    // Load <script> tag javascript ad substitution
     var converter = Components.classes["@mozilla.org/intl/texttosuburi;1"]
                               .getService(Components.interfaces.nsITextToSubURI);
     var tags = req.responseXML.documentElement.getElementsByTagName("script");
@@ -161,7 +204,7 @@ const component = {
         continue;
 
       var data = tag.QueryInterface(Components.interfaces.nsIDOM3Node).textContent;
-      data = wrapper.replace(/{{SCRIPT}}/g, data).replace(/{{SEED}}/g, seed);
+      data = wrapper.replace(/{{SCRIPT}}/g, data).replace(/{{SEED}}/g, seed); // lint thinks this is invalid... any way around that?
       data = converter.ConvertAndEscape('utf-8', data).replace(/\+/g, "%20");
       data = 'data:text/javascript,' + data;
       scripts.push([id, data]);
@@ -242,4 +285,27 @@ const component = {
 
     throw Components.results.NS_ERROR_NO_INTERFACE;
   }
+}
+
+
+
+// small wrapper for fetching a remote stream
+// -> http://forums.mozillazine.org/viewtopic.php?p=921150#921150
+// TODO should be async?
+// -> http://developer.mozilla.org/en/docs/Code_snippets:File_I/O#Asynchronously
+// -> http://www.xulplanet.com/references/xpcomref/ifaces/nsIChannel.html#method_asyncOpen
+function getContents(aURL){
+  var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+    .getService(Components.interfaces.nsIIOService);
+  var scriptableStream = Components
+    .classes["@mozilla.org/scriptableinputstream;1"]
+    .getService(Components.interfaces.nsIScriptableInputStream);
+
+  var channel = ioService.newChannel(aURL,null,null);
+  var input = channel.open();
+  scriptableStream.init(input);
+  var str = scriptableStream.read(input.available());
+  scriptableStream.close();
+  input.close();
+  return str;
 }
