@@ -1,0 +1,4 @@
+content   addart jar:chrome/addart.jar!/content/
+skin      addart classic/1.0 jar:chrome/addart.jar!/skin/classic/
+overlay   chrome://browser/content/browser.xul chrome://addart/content/versionsplash.xul
+
