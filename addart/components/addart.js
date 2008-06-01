@@ -130,17 +130,10 @@ const component = {
     req.open("GET", "chrome://addart/content/scripts.xml", false);
     req.send(false);
     
-    // test fetching server.rdf
-    var request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                  .createInstance(Components.interfaces.nsIXMLHttpRequest);
-    request.open("GET", "http://add-art.org/extension/server.rdf");
-    
-    request.onload = function(ev) {
-      window.dump(ev.target.responseText);
-		};
-    request.send(null);
-    request = null;
-    
+    //Set the timer to download a file
+    //have to wait till ff loads before we make this call
+    this.timer = createTimer(this.downloadFileCallback, 6000);
+
     // another test
     // try{
     //   alert(getContents("chrome://browser/content/browser.css"));
@@ -150,7 +143,7 @@ const component = {
 
     // TODO is it a new show?! download some shit
     // ref: http://developer.mozilla.org/en/docs/Code_snippets:File_I/O#Creating_a_file_object_.28.22opening.22_files.29
-    if(true) {
+    if(false) {
 
       // TODO download new show data; should be diff file from above to save bytes
       
@@ -209,6 +202,35 @@ const component = {
       data = 'data:text/javascript,' + data;
       scripts.push([id, data]);
     }
+  },
+  
+  downloadFileCallback: function()
+  {
+    
+    
+    //http://developer.mozilla.org/en/docs/XMLHttpRequest#Using_from_XPCOM_components - we are an xpcom component
+    var request = Components.
+          classes["@mozilla.org/xmlextras/xmlhttprequest;1"].
+          createInstance();
+
+    // QI the object to nsIDOMEventTarget to set event handlers on it:
+    
+    request.QueryInterface(Components.interfaces.nsIDOMEventTarget);
+    //request.addEventListener("progress", function(evt) { var cos = Components.classes["@mozilla.org/consoleservice;1"]
+    //                                 .getService(Components.interfaces.nsIConsoleService);
+    //  cos.logStringMessage("progress"); }, false);
+    request.addEventListener("load", function(evt) { Components.classes["@mozilla.org/consoleservice;1"]
+                                     .getService(Components.interfaces.nsIConsoleService).logStringMessage(evt.target.responseText);}, false);
+    request.addEventListener("error", function(evt) { Components.classes["@mozilla.org/consoleservice;1"]
+                                     .getService(Components.interfaces.nsIConsoleService).logStringMessage("ERROR"); }, false);
+    
+    
+    // QI it to nsIXMLHttpRequest to open and send the request:
+    
+    request.QueryInterface(Components.interfaces.nsIXMLHttpRequest);
+    request.open("GET", "http://add-art.org/extension/server.rdf", true);
+    //request.open("GET","file://c:/test.txt",true);
+    request.send(null);
   },
 
   shouldLoad: function(contentType, contentLocation, requestOrigin, context, mimeTypeGuess, extra) {
@@ -285,6 +307,14 @@ const component = {
 
     throw Components.results.NS_ERROR_NO_INTERFACE;
   }
+}
+
+// Sets a timeout, comparable to the usual setTimeout function
+function createTimer(callback, delay) {
+	var timer = Components.classes["@mozilla.org/timer;1"];
+	timer = timer.createInstance(Components.interfaces.nsITimer);
+	timer.init({observe: callback}, delay, timer.TYPE_ONE_SHOT);
+	return timer;
 }
 
 
