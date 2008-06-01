@@ -24,5 +24,5 @@ move addart-build.xpi ../.
 cd ..
 rmdir addart_working /S /Q
 
-%zf%\7z a -tzip "addart.xpi" *.xpi install.rdf -mx=9
+%zf%\7z a -tzip "addart.xpi" addart-build.xpi adblock_plus.xpi install.rdf -mx=9
 del addart-build.xpi

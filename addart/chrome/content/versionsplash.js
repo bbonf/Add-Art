@@ -11,6 +11,7 @@ var addonart = {
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService);
     prefs = prefs.getBranch("add-art.org.prefs.");
+    consoleService.logStringMessage("I bet this doesn't show up");
     // The version service gives us access to versions defined in install.rdf
     var versionChecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
                              .getService(Components.interfaces.nsIVersionComparator);
@@ -19,15 +20,18 @@ var addonart = {
     var addon = em.getItemForID("development@add-art.org");
     var currentVersion = addon.version;
     var lastVersion = null;
-	  consoleService.logStringMessage("current");
-	  consoleService.logStringMessage(currentVersion);
+    consoleService.logStringMessage("current");
+    consoleService.logStringMessage(currentVersion);
 
     if (prefs.prefHasUserValue("currentVersion"))
       lastVersion = prefs.getCharPref("currentVersion");
+    
 
+    consoleService.logStringMessage("last Version" + lastVersion);
     if (!lastVersion) {/* This is the first time this was installed */
 	consoleService.logStringMessage("First time this was installed");
       prefs.setCharPref("currentVersion", currentVersion);
+      consoleService.logStringMessage("we set the version in about config, eh what?");
       var url = "http://add-art.org/version.php?ver=" + currentVersion;
       gBrowser.selectedTab = gBrowser.addTab(url, null);
     } else if (versionChecker.compare(currentVersion,lastVersion) > 0) {
@@ -39,5 +43,6 @@ var addonart = {
     }
   }
 }
+
 
 window.addEventListener("load", addonart.init, false);
