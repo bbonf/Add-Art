@@ -1,10 +1,15 @@
-var urlCheckXML = "http://add-art.org/extension/image_set.xml";
-// var urlCheckXML = "http://www.ethanham.com/test/image_set.xml";
+// We append "?" + the current unixtime stamp tot he path for image_set.xml
+// to force the file to be downloaded (as opposed to using a cached version
+// of the file).
+var date = new Date();
+var urlCheckXML = "http://add-art.org/extension/image_set.xml?"+date.getTime();
+//var urlCheckXML = "http://www.ethanham.com/test/image_set.xml?"+date.getTime();
+
 var aaPreferences;
 var aaExtensionPath;
 var aaFileSep;
 var aaNextSet;
-var aaNextExpiration; 
+var aaNextExpiration;
 
 
 aaPreferences = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
@@ -32,12 +37,11 @@ else
 
 // check and see if our check-for-new-images date has elapsed
 if(aaPreferences.prefHasUserValue("extensions.add-art.expiration"))
-{
-	var date = new Date();
+{	
 	if(date.getTime() > aaPreferences.getCharPref("extensions.add-art.expiration"))  // need to store as string because the number is too large for an int
-	{	
+	{		
 		getImageSetInfo(); // time to check for new images
-	}
+	}	
 }
 else
 {
