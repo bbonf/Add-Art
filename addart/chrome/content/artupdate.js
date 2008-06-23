@@ -3,9 +3,9 @@
 // of the file).
 var date = new Date();
 var urlCheckXML = "http://add-art.org/extension/image_set.xml?"+date.getTime();
-// var urlCheckXML = "http://www.ethanham.com/test/image_set.xml?"+date.getTime();
+/*var urlCheckXML = "http://www.ethanham.com/test/image_set.xml?"+date.getTime();
 alert("remember to change the xml path");
-
+*/
 var aaPreferences;
 var aaExtensionPath;
 var aaFileSep;
@@ -37,11 +37,11 @@ else
 
 // check and see if we have a new set of art (it would have been downloaded during the last
 // firefox session
-if(aaFileLoc.search(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar"))
+var downloadedfile = Components.classes["@mozilla.org/file/local;1"]
+							.createInstance(Components.interfaces.nsILocalFile);
+downloadedfile.initWithPath(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar");
+if(downloadedfile.exists())
 {
-	var downloadedfile = Components.classes["@mozilla.org/file/local;1"]
-								.createInstance(Components.interfaces.nsILocalFile);
-	downloadedfile.initWithPath(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar");
 	downloadedfile.moveTo(null, "images.jar");	
 }
 
@@ -121,6 +121,8 @@ function downloadNewImages(url)
 
 			aaPreferences.setIntPref("extensions.add-art.currentImageSet", aaNextSet);
 			aaPreferences.setCharPref("extensions.add-art.expiration", aaNextExpiration);
+			
+			alert("Add-Art has downloaded new images,\nplease restart Firefox to see them.");
 		 }
 	  }
 	};
