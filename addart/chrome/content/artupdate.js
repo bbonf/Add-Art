@@ -3,7 +3,8 @@
 // of the file).
 var date = new Date();
 var urlCheckXML = "http://add-art.org/extension/image_set.xml?"+date.getTime();
-//var urlCheckXML = "http://www.ethanham.com/test/image_set.xml?"+date.getTime();
+// var urlCheckXML = "http://www.ethanham.com/test/image_set.xml?"+date.getTime();
+alert("remember to change the xml path");
 
 var aaPreferences;
 var aaExtensionPath;
@@ -23,9 +24,9 @@ aaExtensionPath = Components.classes["@mozilla.org/extensions/manager;1"]
 
 // Figure out what is the correct file separator (to handle both PCs and Macs) 
 const DIR_SERVICE = new Components.Constructor("@mozilla.org/file/directory_service;1","nsIProperties");
-aaFileSep=(new DIR_SERVICE()).get("ProfD", Components.interfaces.nsIFile).path; 
+aaFileLoc=(new DIR_SERVICE()).get("ProfD", Components.interfaces.nsIFile).path; 
 // determine the file-separator
-if (aaFileSep.search(/\\/) != -1) 
+if (aaFileLoc.search(/\\/) != -1) 
 {
 	aaFileSep = "\\";
 } 
@@ -34,6 +35,15 @@ else
 	aaFileSep = "/";
 }	
 
+// check and see if we have a new set of art (it would have been downloaded during the last
+// firefox session
+if(aaFileLoc.search(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar"))
+{
+	var downloadedfile = Components.classes["@mozilla.org/file/local;1"]
+								.createInstance(Components.interfaces.nsILocalFile);
+	downloadedfile.initWithPath(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar");
+	downloadedfile.moveTo(null, "images.jar");	
+}
 
 // check and see if our check-for-new-images date has elapsed
 if(aaPreferences.prefHasUserValue("extensions.add-art.expiration"))
@@ -94,7 +104,7 @@ function downloadNewImages(url)
 
 			var outputfile = Components.classes["@mozilla.org/file/local;1"]
 								.createInstance(Components.interfaces.nsILocalFile);
-			outputfile.initWithPath(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "images.jar");
+			outputfile.initWithPath(aaExtensionPath + aaFileSep + "chrome" + aaFileSep + "~images.jar");
 		
 			// file is nsIFile, data is a string
 			var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
