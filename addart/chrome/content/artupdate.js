@@ -4,7 +4,7 @@ var aaPreferences;
 var aaExtensionPath;
 var aaFileSep;
 var aaNextSet;
-var aaNextExpiration;
+var aaNextExpiration; 
 
 
 aaPreferences = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
