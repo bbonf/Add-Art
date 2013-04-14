@@ -13,11 +13,9 @@ find . -type d -name .svn | xargs rm -rf
 # package things up
 echo "Zippin..."
 cd chrome
-rm -f addart.jar
-zip -rq addart.jar content skin locale
-rm -rf content skin locale
+zip -rq addart.jar content skin
+rm -rf content skin
 cd ..
-rm -f ../addart-build.xpi
 zip -rq ../addart-build.xpi .
 
 # revert & back out
